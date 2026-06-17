@@ -16,3 +16,6 @@
 # Kubernetes
 kubeconfig
 *.kubeconfig
+
+# Local planning notes (not for commit)
+PLAN.md
