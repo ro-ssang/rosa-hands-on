@@ -10,3 +10,4 @@
 | 3 | [처음 만나는 AWS](./3-처음-만나는-AWS) | AWS에 어떻게 처음 접속하는가? | aws provider, profile, data, S3, 비용 습관 |
 | 4 | [state는 무엇이고 왜 골치인가](./4-state는-무엇이고-왜-골치인가) | drift와 local state의 한계를 어떻게 다루는가? | state, drift, refresh-only, terraform state, remote backend |
 | 5 | [VPC와 친구들](./5-VPC와-친구들) | AWS 네트워킹을 어떻게 코드로 짜는가? | VPC, subnet, IGW, route table, security group |
+| 6 | [IAM](./6-IAM) | 권한을 어떻게 코드로 짜고 검증하는가? | policy, role, trust policy, AssumeRole, 최소 권한 |
