@@ -11,3 +11,4 @@
 | 4 | [state는 무엇이고 왜 골치인가](./4-state는-무엇이고-왜-골치인가) | drift와 local state의 한계를 어떻게 다루는가? | state, drift, refresh-only, terraform state, remote backend |
 | 5 | [VPC와 친구들](./5-VPC와-친구들) | AWS 네트워킹을 어떻게 코드로 짜는가? | VPC, subnet, IGW, route table, security group |
 | 6 | [IAM](./6-IAM) | 권한을 어떻게 코드로 짜고 검증하는가? | policy, role, trust policy, AssumeRole, 최소 권한 |
+| 7 | [EC2 한 대 띄우고 SSH까지](./7-EC2-한-대-띄우고-SSH까지) | EC2 한 대를 어떻게 띄우고 들어가는가? | AMI, key pair, user_data, security group, EC2 |
