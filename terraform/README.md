@@ -14,3 +14,4 @@
 | 7 | [EC2 한 대 띄우고 SSH까지](./7-EC2-한-대-띄우고-SSH까지) | EC2 한 대를 어떻게 띄우고 들어가는가? | AMI, key pair, user_data, security group, EC2 |
 | 8 | [모듈 — 무엇을 떼어내는가](./8-모듈-무엇을-떼어내는가) | 반복되는 인프라를 어떻게 모듈로 떼어내는가? | module, source, input/output, for_each, 버전 핀 |
 | 9 | [remote state](./9-remote-state) | state를 어떻게 공용 저장소로 옮기고 동시 작업을 막는가? | backend "s3", use_lockfile, 부트스트랩, init -migrate-state |
+| 10 | [리소스 라이프사이클](./10-리소스-라이프사이클) | 리소스의 변경·리네임·기존 자원 편입을 어떻게 다루는가? | in-place vs replace, lifecycle, moved, import |
