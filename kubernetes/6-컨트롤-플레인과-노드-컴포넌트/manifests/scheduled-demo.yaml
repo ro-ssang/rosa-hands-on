@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scheduled-demo
+  namespace: rosa-lab
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.27
