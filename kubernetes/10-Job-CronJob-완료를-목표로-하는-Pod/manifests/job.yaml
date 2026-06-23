@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello
+  namespace: rosa-lab
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: hello
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - 'echo "[$(date)] hello from $(hostname)"; sleep 3'
