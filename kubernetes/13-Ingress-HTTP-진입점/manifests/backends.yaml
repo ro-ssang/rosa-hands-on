@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-a
+  namespace: rosa-lab
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-a
+  template:
+    metadata:
+      labels:
+        app: hello-a
+    spec:
+      containers:
+        - name: hello
+          image: hashicorp/http-echo:1.0
+          args:
+            - -text=service A — $(POD_NAME)
+            - -listen=:8080
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-a
+  namespace: rosa-lab
+spec:
+  selector:
+    app: hello-a
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-b
+  namespace: rosa-lab
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-b
+  template:
+    metadata:
+      labels:
+        app: hello-b
+    spec:
+      containers:
+        - name: hello
+          image: hashicorp/http-echo:1.0
+          args:
+            - -text=service B — $(POD_NAME)
+            - -listen=:8080
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-b
+  namespace: rosa-lab
+spec:
+  selector:
+    app: hello-b
+  ports:
+    - port: 80
+      targetPort: 8080
