@@ -313,7 +313,7 @@ $ kubectl logs -n kube-system kube-controller-manager-rosa-lab-control-plane \
 50
 ```
 
-각 컨트롤러는 자기가 관심 있는 리소스(예: ReplicaSet 컨트롤러는 ReplicaSet)를 apiserver에서 감시하다가, 원하는 상태와 실제 상태가 어긋나면 차이를 메우는 일을 합니다. Deployment · ReplicaSet · Job 같은 상위 리소스가 알아서 "Pod 개수를 맞추는" 동작은 모두 이 묶음 안의 컨트롤러 하나가 굴리는 것입니다.
+각 컨트롤러는 자기가 관심 있는 리소스(예: ReplicaSet 컨트롤러는 ReplicaSet)를 apiserver에서 감시하다가, 원하는 상태와 실제 상태가 어긋나면 차이를 메우는 일을 합니다. Deployment · ReplicaSet · Job 같은 상위 리소스가 알아서 "Pod 개수를 맞추는" 동작은 모두 이 묶음 안의 컨트롤러 하나가 맡는 일입니다.
 
 ### 정리
 
