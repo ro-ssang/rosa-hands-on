@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-logger
+  namespace: rosa-lab
+spec:
+  selector:
+    matchLabels:
+      app: node-logger
+  template:
+    metadata:
+      labels:
+        app: node-logger
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: logger
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                echo "[$(date)] hello from $(hostname) on node ${NODE_NAME}";
+                sleep 30;
+              done
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
