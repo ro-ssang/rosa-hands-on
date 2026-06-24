@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hamster
+  namespace: rosa-lab
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hamster
+  template:
+    metadata:
+      labels:
+        app: hamster
+    spec:
+      containers:
+        - name: hamster
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - while true; do :; done
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
