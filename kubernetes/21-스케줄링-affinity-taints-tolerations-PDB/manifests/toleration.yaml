@@ -1,0 +1,37 @@
+# 같은 노드(dedicated=batch 라벨 + dedicated=batch:NoSchedule 테인트)를 노리는 두 Pod.
+# 차이는 toleration 하나뿐이다 — 테인트가 무엇을 막는지 대조해서 본다.
+---
+# toleration 없음 → 노드의 NoSchedule 테인트를 못 견뎌 Pending에 머문다.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: batch-no-toleration
+  namespace: rosa-lab
+  labels:
+    app: batch
+spec:
+  nodeSelector:
+    dedicated: batch
+  containers:
+    - name: app
+      image: registry.k8s.io/pause:3.9
+---
+# toleration 있음 → 같은 테인트를 견디고 그 노드에 배치된다.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: batch-job
+  namespace: rosa-lab
+  labels:
+    app: batch
+spec:
+  nodeSelector:
+    dedicated: batch
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: batch
+      effect: NoSchedule
+  containers:
+    - name: app
+      image: registry.k8s.io/pause:3.9

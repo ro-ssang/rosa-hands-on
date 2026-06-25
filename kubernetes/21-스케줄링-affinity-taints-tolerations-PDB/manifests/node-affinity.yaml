@@ -1,0 +1,28 @@
+# nodeAffinity(required) — disktype=ssd 라벨이 붙은 노드에만 둔다.
+# 라벨이 없는 노드는 스케줄러의 "필터링" 단계에서 후보에서 제외된다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ssd
+  namespace: rosa-lab
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-ssd
+  template:
+    metadata:
+      labels:
+        app: web-ssd
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: disktype
+                    operator: In
+                    values: ["ssd"]
+      containers:
+        - name: app
+          image: registry.k8s.io/pause:3.9

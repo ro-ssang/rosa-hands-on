@@ -1,0 +1,10 @@
+# 멀티 노드 클러스터 — 스케줄링은 "여러 노드 중 어디"를 정하는 문제이므로
+# 워커가 둘 이상 있어야 affinity·anti-affinity·drain을 손으로 확인할 수 있습니다.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: rosa-lab
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker
+  - role: worker

@@ -1,0 +1,31 @@
+# PodDisruptionBudget — drain·노드 업그레이드 같은 자발적 퇴출(voluntary disruption)에서
+# 살아있어야 할 Pod의 최소 수를 보장한다. 스케줄러가 아니라 Eviction API가 이 기준을 본다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: rosa-lab
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: app
+          image: registry.k8s.io/pause:3.9
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api
+  namespace: rosa-lab
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api

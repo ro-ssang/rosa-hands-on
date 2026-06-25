@@ -1,0 +1,27 @@
+# podAntiAffinity(required) — 같은 app=spread 라벨을 가진 Pod이 이미 있는 노드는 제외한다.
+# topologyKey=kubernetes.io/hostname 이므로 "노드 단위로 한 대씩" 흩어진다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spread
+  namespace: rosa-lab
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spread
+  template:
+    metadata:
+      labels:
+        app: spread
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: spread
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: app
+          image: registry.k8s.io/pause:3.9
