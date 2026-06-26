@@ -12,3 +12,4 @@
 | 4 | [Helm 내부 구조 — release는 어디 저장되는가](./4-Helm-내부-구조-release는-어디-저장되는가) | `helm install`이 만든 release 상태는 어디에, 어떤 형태로 저장되는가? | sh.helm.release Secret, base64·gzip 디코드, storage driver |
 | 5 | [chart 해부 — chart는 무엇으로 이뤄지는가](./5-chart-해부) | chart는 무엇으로 이뤄지는가? | helm create, Chart.yaml · values.yaml · templates/ · NOTES.txt · _helpers.tpl |
 | 6 | [템플릿 엔진 — 값이 어떻게 매니페스트로 펼쳐지는가](./6-템플릿-엔진) | 값이 어떻게 매니페스트로 펼쳐지는가? | .Values · .Release · .Chart, 파이프 · 함수(default·quote·toYaml·nindent), 공백 제어 |
+| 7 | [렌더 디버깅 — 적용 전에 결과를 눈으로 확인하기](./7-렌더-디버깅) | 클러스터에 적용하기 전에 렌더 결과를 어떻게 눈으로 확인하는가? | helm template · --dry-run=server · get manifest, --debug · -s |
