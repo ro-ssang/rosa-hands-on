@@ -1,0 +1,6 @@
+apiVersion: v2
+name: web
+description: 같은 매니페스트를 release 한 단위로 묶기만 한 최소 chart (chart 구조 해부는 5편)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
