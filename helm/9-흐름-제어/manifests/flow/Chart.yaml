@@ -1,0 +1,6 @@
+apiVersion: v2
+name: flow
+description: 흐름 제어(if·range·with·변수) 시연용 chart
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

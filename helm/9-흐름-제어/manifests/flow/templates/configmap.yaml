@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-flow
+data:
+  # if / else — 조건에 따라 다른 값
+  mode: {{ if .Values.featureEnabled }}enabled{{ else }}disabled{{ end }}
+  # range over list — 인덱스와 원소
+  {{- range $i, $e := .Values.env }}
+  env-{{ $i }}: {{ $e.name }}={{ $e.value }}
+  {{- end }}
+  # range over map — 키와 값
+  {{- range $k, $v := .Values.labels }}
+  label-{{ $k }}: {{ $v }}
+  {{- end }}
+  # with — 스코프를 .Values.config 로 좁힘
+  {{- with .Values.config }}
+  endpoint: {{ .host }}:{{ .port }}
+  {{- end }}
+  # range 안에서 . 는 원소다 → 루트는 $ 로 접근
+  {{- range .Values.env }}
+  {{ $.Release.Name }}-{{ .name }}: {{ .value }}
+  {{- end }}

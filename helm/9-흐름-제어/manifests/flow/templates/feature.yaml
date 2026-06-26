@@ -1,0 +1,8 @@
+{{- if .Values.featureEnabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-feature
+data:
+  note: "feature is on"
+{{- end }}

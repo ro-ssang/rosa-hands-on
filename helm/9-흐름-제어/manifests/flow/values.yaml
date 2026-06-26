@@ -1,0 +1,12 @@
+featureEnabled: true
+env:
+  - name: LOG_LEVEL
+    value: info
+  - name: REGION
+    value: ap-northeast-2
+labels:
+  team: platform
+  tier: backend
+config:
+  host: example.com
+  port: 8080
