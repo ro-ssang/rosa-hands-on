@@ -13,3 +13,4 @@
 | 5 | [chart 해부 — chart는 무엇으로 이뤄지는가](./5-chart-해부) | chart는 무엇으로 이뤄지는가? | helm create, Chart.yaml · values.yaml · templates/ · NOTES.txt · _helpers.tpl |
 | 6 | [템플릿 엔진 — 값이 어떻게 매니페스트로 펼쳐지는가](./6-템플릿-엔진) | 값이 어떻게 매니페스트로 펼쳐지는가? | .Values · .Release · .Chart, 파이프 · 함수(default·quote·toYaml·nindent), 공백 제어 |
 | 7 | [렌더 디버깅 — 적용 전에 결과를 눈으로 확인하기](./7-렌더-디버깅) | 클러스터에 적용하기 전에 렌더 결과를 어떻게 눈으로 확인하는가? | helm template · --dry-run=server · get manifest, --debug · -s |
+| 8 | [변경 비교 — helm diff upgrade](./8-변경-비교-helm-diff) | upgrade하면 실제로 무엇이 바뀌는가? | helm-diff plugin, diff upgrade · diff revision, -/+ 미리보기 |
