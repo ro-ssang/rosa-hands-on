@@ -1,0 +1,18 @@
+replicaCount: 3
+image:
+  tag: "1.27-alpine"
+config:
+  LOG_LEVEL: warn
+  GREETING: "hello from prod"
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: my-service.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi

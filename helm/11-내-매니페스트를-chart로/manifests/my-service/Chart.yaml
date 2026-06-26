@@ -1,0 +1,6 @@
+apiVersion: v2
+name: my-service
+description: 내 매니페스트(Deployment·Service·ConfigMap·Ingress)를 옮긴 chart
+type: application
+version: 0.1.0
+appVersion: "1.27"
