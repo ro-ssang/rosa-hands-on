@@ -81,8 +81,6 @@ kubectl config set-context --current --namespace=rosa-lab
 
 ### helm repo add — chart는 어디서 오나
 
-_전제: Helm v3가 설치되고 인터넷에 연결된 상태._
-
 chart repo를 등록하고 색인을 받습니다.
 
 ```bash
@@ -109,8 +107,6 @@ podinfo	https://stefanprodan.github.io/podinfo
 ```
 
 ### helm search repo — 무엇을, 어느 버전을
-
-_전제: `podinfo` repo가 등록·업데이트된 상태._
 
 등록한 repo에서 chart를 찾고, 고를 수 있는 버전을 봅니다.
 
@@ -149,8 +145,6 @@ version: 6.14.0
 ```
 
 ### helm show values — 무엇을 바꿀 수 있나
-
-_전제: `podinfo` repo가 등록된 상태._
 
 남의 chart를 설치하기 전, 노출된 값을 먼저 읽습니다. 이게 "이 chart를 어떻게 설정하는가"의 사용설명서입니다.
 
@@ -192,8 +186,6 @@ ui:
 
 ### helm install — release 이름은 내가 정한다
 
-_전제: `podinfo` repo가 등록되고, `rosa-lab`에 `web` release가 없는 상태._
-
 repo의 chart를, 버전을 고정하고, 내 values를 얹어 설치합니다.
 
 ```bash
@@ -224,8 +216,6 @@ web 	rosa-lab 	1       	2026-06-26 15:33:08.13605 +0900 KST	deployed	podinfo-6.1
 ```
 
 ### helm get — 무엇이, 어떤 값으로 깔렸나
-
-_전제: `web` release가 설치된 상태._
 
 "내가 준 값"과 "병합된 최종값"은 다른 명령으로 봅니다.
 
@@ -274,8 +264,6 @@ helm get manifest web -n rosa-lab | grep -nE 'replicas:|PODINFO_UI_MESSAGE|hello
 내 두 값이 `replicas: 2`와 환경변수로 정확히 들어갔습니다. (`helm get notes web`은 설치 때 본 `NOTES`를, `helm status web`은 release 상태 요약을 다시 보여 줍니다.)
 
 ### 값이 진짜 동작하나 — 앱 응답으로 확인
-
-_전제: `web` release가 설치되고 Pod가 Running인 상태._
 
 렌더된 매니페스트만이 아니라, 클러스터에서 실제로 그 값이 동작하는지 봅니다. `replicaCount: 2`는 Pod 수로, `ui.message`는 앱 응답으로 드러납니다.
 

@@ -88,8 +88,6 @@ kubectl config set-context --current --namespace=rosa-lab
 
 ### kubectl apply -f — 묶음이라는 개념이 없다
 
-_전제: `rosa-lab` namespace에 `web` 관련 객체가 없는 상태._ 다시 시작하려면 `kubectl delete deploy,svc,cm -l app=web --ignore-not-found`로 비웁니다.
-
 세 객체를 한 번에 적용합니다.
 
 ```bash
@@ -145,7 +143,7 @@ web-config   1      12s
 
 ### helm install — release가 단위다
 
-_전제: `rosa-lab` namespace에 `web` 관련 객체·release가 없는 상태._ `manifests/chart/`는 같은 Deployment·Service·ConfigMap을 담은 최소 chart이고, 차이는 배포 방식뿐입니다. 같은 이름의 객체가 이미 있으면 helm이 소유권 충돌을 내므로 먼저 비우고 설치합니다.
+`manifests/chart/`는 같은 Deployment·Service·ConfigMap을 담은 최소 chart이고, 차이는 배포 방식뿐입니다. 같은 이름의 객체가 이미 있으면 helm이 소유권 충돌을 내므로 먼저 비우고 설치합니다.
 
 ```bash
 kubectl delete deploy,svc,cm -l app=web --ignore-not-found
@@ -176,8 +174,6 @@ web 	rosa-lab 	1       	2026-06-26 14:39:56.838061 +0900 KST	deployed	web-0.1.0	
 
 ### helm upgrade — release는 빠진 객체를 정리한다
 
-_전제: `web` release가 ConfigMap을 포함해 설치된 상태(revision 1). 건너뛰었다면 `helm install web manifests/chart/`를 먼저 실행합니다._
-
 `apply`에서는 구성에서 ConfigMap을 빼도 orphan으로 남았습니다. 같은 변경을 Helm에서 재현합니다 — chart에서 ConfigMap 템플릿을 빼고 업그레이드합니다.
 
 ```bash
@@ -204,8 +200,6 @@ Error from server (NotFound): configmaps "web-config" not found
 **`apply`에서는 남았던 ConfigMap이, 여기서는 정리됐습니다.** helm은 revision 1의 객체 집합(세 개)과 새로 렌더한 집합(두 개)을 비교해, 더 이상 없는 ConfigMap을 삭제합니다. "이전 집합"이 release에 있기에 가능한 일입니다.
 
 ### helm rollback — release는 이력에서 복원한다
-
-_전제: ConfigMap을 뺀 upgrade까지 마쳐, revision 2가 deployed인 상태(ConfigMap이 정리됨)._
 
 release는 변경마다 revision을 쌓습니다.
 
@@ -241,8 +235,6 @@ web-config   1      1s
 **ConfigMap이 다시 생겼습니다.** 주목할 점은, 방금 `rm`으로 지운 템플릿 파일을 복구하지 않았다는 것입니다 — rollback은 로컬 파일이 아니라 **release에 저장된 revision 1의 매니페스트**에서 복원합니다. 즉 helm은 각 revision의 렌더 결과를 클러스터 어딘가에 들고 있습니다. 어디에, 어떤 형태로 저장하기에 이게 가능한지는 4편에서 봅니다.
 
 ### helm uninstall — 묶음을 한 번에
-
-_전제: `web` release가 존재하는 상태(`helm list`에 보임)._
 
 release가 단위이므로, 삭제도 단위입니다.
 
