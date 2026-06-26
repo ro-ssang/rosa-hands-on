@@ -1,0 +1,1 @@
+welcomeMessage: "Hello from {{ .Release.Name }}"

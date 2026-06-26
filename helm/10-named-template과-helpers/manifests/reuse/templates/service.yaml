@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "reuse.fullname" . }}
+  labels:
+    {{- include "reuse.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "reuse.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: 80

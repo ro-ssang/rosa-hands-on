@@ -15,3 +15,4 @@
 | 7 | [렌더 디버깅 — 적용 전에 결과를 눈으로 확인하기](./7-렌더-디버깅) | 클러스터에 적용하기 전에 렌더 결과를 어떻게 눈으로 확인하는가? | helm template · --dry-run=server · get manifest, --debug · -s |
 | 8 | [변경 비교 — helm diff upgrade](./8-변경-비교-helm-diff) | upgrade하면 실제로 무엇이 바뀌는가? | helm-diff plugin, diff upgrade · diff revision, -/+ 미리보기 |
 | 9 | [흐름 제어 — 조건·반복을 템플릿에서 표현하기](./9-흐름-제어) | 조건·반복을 템플릿에서 어떻게 표현하는가? | if · range · with · 변수 · $, 객체 토글 |
+| 10 | [named template과 _helpers.tpl — 반복 블록을 재사용하기](./10-named-template과-helpers) | 반복되는 블록을 어떻게 재사용하는가? | define · include · tpl, 컨텍스트 ., 이름·라벨 규칙 |

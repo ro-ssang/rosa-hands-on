@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "reuse.fullname" . }}
+  labels:
+    {{- include "reuse.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "reuse.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "reuse.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27
