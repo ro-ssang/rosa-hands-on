@@ -11,3 +11,4 @@
 | 3 | [release 라이프사이클 — upgrade · rollback](./3-release-라이프사이클-upgrade-rollback) | 설치한 release를 어떻게 올리고(upgrade) 되돌리는가(rollback)? | revision · history, rollback, --reuse-values |
 | 4 | [Helm 내부 구조 — release는 어디 저장되는가](./4-Helm-내부-구조-release는-어디-저장되는가) | `helm install`이 만든 release 상태는 어디에, 어떤 형태로 저장되는가? | sh.helm.release Secret, base64·gzip 디코드, storage driver |
 | 5 | [chart 해부 — chart는 무엇으로 이뤄지는가](./5-chart-해부) | chart는 무엇으로 이뤄지는가? | helm create, Chart.yaml · values.yaml · templates/ · NOTES.txt · _helpers.tpl |
+| 6 | [템플릿 엔진 — 값이 어떻게 매니페스트로 펼쳐지는가](./6-템플릿-엔진) | 값이 어떻게 매니페스트로 펼쳐지는가? | .Values · .Release · .Chart, 파이프 · 함수(default·quote·toYaml·nindent), 공백 제어 |

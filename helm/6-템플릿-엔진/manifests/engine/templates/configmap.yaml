@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-engine
+  labels:
+    {{- toYaml .Values.labels | nindent 4 }}
+data:
+  # 내장 객체 .Release — 설치 시점 정보
+  releaseName: {{ .Release.Name }}
+  releaseNamespace: {{ .Release.Namespace }}
+  releaseRevision: {{ .Release.Revision | quote }}
+  # 내장 객체 .Chart — Chart.yaml 메타데이터
+  chartName: {{ .Chart.Name }}
+  chartVersion: {{ .Chart.Version }}
+  # .Values 접근 (중첩 키)
+  greeting: {{ .Values.greeting | quote }}
+  greetingUpper: {{ .Values.greeting | upper | quote }}
+  # 파이프 + default: image.tag가 비면 .Chart.AppVersion으로 대체
+  image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+  replicas: {{ .Values.replicaCount }}

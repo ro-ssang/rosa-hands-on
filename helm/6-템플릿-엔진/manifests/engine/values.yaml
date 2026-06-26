@@ -1,0 +1,8 @@
+greeting: hello
+replicaCount: 2
+image:
+  repository: nginx
+  tag: ""            # 빈 값 — default 함수로 .Chart.AppVersion 대체 시연
+labels:
+  team: platform
+  env: dev
