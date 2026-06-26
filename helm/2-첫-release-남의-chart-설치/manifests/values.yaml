@@ -1,0 +1,4 @@
+# podinfo chart의 기본값을 덮어쓰는 consumer override
+replicaCount: 2
+ui:
+  message: "hello from rosa-lab"
