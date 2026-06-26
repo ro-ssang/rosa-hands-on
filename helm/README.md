@@ -17,3 +17,4 @@
 | 9 | [흐름 제어 — 조건·반복을 템플릿에서 표현하기](./9-흐름-제어) | 조건·반복을 템플릿에서 어떻게 표현하는가? | if · range · with · 변수 · $, 객체 토글 |
 | 10 | [named template과 _helpers.tpl — 반복 블록을 재사용하기](./10-named-template과-helpers) | 반복되는 블록을 어떻게 재사용하는가? | define · include · tpl, 컨텍스트 ., 이름·라벨 규칙 |
 | 11 | [내 매니페스트를 chart로 — raw를 동작하는 chart로 옮기기](./11-내-매니페스트를-chart로) | 이미 있는 Deployment·Service·ConfigMap·Ingress를 어떻게 chart로 옮기는가? | 값 추출 · _helpers · if/range, values 오버레이, helm test |
+| 12 | [Helm vs Kubernetes 경계 — 어디까지 Helm이고 어디부터 k8s인가](./12-Helm-vs-Kubernetes-경계) | 어디까지 Helm 책임이고 어디부터 k8s 책임인가? | manifest 제출 vs rollout, deployed≠health, reconcile은 k8s, --atomic |
