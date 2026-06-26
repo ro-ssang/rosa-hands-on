@@ -1,6 +1,6 @@
 # 3. release 라이프사이클 — upgrade · rollback
 
-release는 한 번 설치하고 끝나지 않습니다. 값을 바꾸고, chart 버전을 올리고, 문제가 생기면 되돌립니다. 이 편은 그 라이프사이클을 revision 단위로 봅니다. 핵심 감각은 두 가지입니다 — **upgrade도 rollback도 새 revision을 쌓을 뿐, 과거 revision을 지우지 않는다**(그래서 어디로든 되돌릴 수 있다), 그리고 **기본 `helm upgrade`는 이전 값을 자동으로 이어받지 않는다**(이번에 주지 않은 값은 chart 기본값으로 돌아간다 — `--reuse-values`가 그 동작을 바꾼다). 실습은 `podinfo`를 설치한 뒤 값·버전을 올려 revision을 쌓고, `helm history`로 그 궤적을 읽고, 특정 revision으로 rollback합니다. 산출물은 revision이 어떻게 쌓이고 rollback이 어디서 복원하는지에 대한 재현 가능한 기록과, upgrade 시 값이 병합되는 규칙을 직접 본 경험입니다. 실패한 upgrade를 자동 복구하는 옵션(`--atomic`·`--wait`)과 깨진 release 진단은 운영 편(29·30편)에서 다룹니다.
+release는 한 번 설치하고 끝나지 않습니다. 값을 바꾸고, chart 버전을 올리고, 문제가 생기면 되돌립니다. 이 편은 그 라이프사이클을 revision 단위로 봅니다. 핵심 감각은 두 가지입니다 — **upgrade도 rollback도 새 revision을 쌓을 뿐, 과거 revision을 지우지 않는다**(그래서 어디로든 되돌릴 수 있다), 그리고 **기본 `helm upgrade`는 이전 값을 자동으로 이어받지 않는다**(이번에 주지 않은 값은 chart 기본값으로 돌아간다 — `--reuse-values`가 그 동작을 바꾼다). 실습은 `podinfo`를 설치한 뒤 값·버전을 올려 revision을 쌓고, `helm history`로 그 궤적을 읽고, 특정 revision으로 rollback합니다. 산출물은 revision이 어떻게 쌓이고 rollback이 어디서 복원하는지에 대한 재현 가능한 기록과, upgrade 시 값이 병합되는 규칙을 직접 본 경험입니다.
 
 ## 핵심 다이어그램
 
@@ -118,7 +118,7 @@ STATUS: deployed
 
 ### helm upgrade — 버전을 바꾸면 rev3
 
-이번엔 chart 버전을 6.14.0으로 올립니다. 값(message)은 다시 지정합니다 — 이유는 마지막 절에서 봅니다.
+이번엔 chart 버전을 6.14.0으로 올립니다. 값(message)도 함께 지정합니다.
 
 ```bash
 helm upgrade web podinfo/podinfo --version 6.14.0 --set ui.message="release v2" -n rosa-lab

@@ -1,6 +1,6 @@
 # 1. 왜 Helm인가 — release라는 단위
 
-`kubectl apply -f`는 매니페스트를 클러스터에 밀어 넣습니다. 객체 하나하나는 정확히 반영되지만, "이 셋이 한 앱이다"라는 사실은 어디에도 남지 않습니다. 그래서 앱 구성에서 객체를 하나 빼도 이전에 만든 객체는 클러스터에 그대로 남고(orphan), "방금 뭘 깔았지"를 물어볼 목록도, "이전 상태로 되돌려라"를 실행할 이력도 없습니다. Helm은 매니페스트 묶음을 **release**라는 한 단위로 다룹니다 — 이름이 붙고, revision이 매겨지고, 설치·업그레이드·롤백·삭제가 그 단위로 일어납니다. 이 편은 같은 앱(Deployment·Service·ConfigMap)을 `kubectl apply -f`로 한 번, `helm install`로 한 번 배포해 라이프사이클의 차이를 손으로 확인합니다. 산출물은 "두 방식의 라이프사이클 차이를 직접 본 재현 가능한 기록"과 "release가 왜 한 단위인가에 대한 한 줄 정의"입니다. release가 클러스터 어디에, 어떤 형태로 저장되기에 rollback이 가능한지는 4편에서 풉니다.
+`kubectl apply -f`는 매니페스트를 클러스터에 밀어 넣습니다. 객체 하나하나는 정확히 반영되지만, "이 셋이 한 앱이다"라는 사실은 어디에도 남지 않습니다. 그래서 앱 구성에서 객체를 하나 빼도 이전에 만든 객체는 클러스터에 그대로 남고(orphan), "방금 뭘 깔았지"를 물어볼 목록도, "이전 상태로 되돌려라"를 실행할 이력도 없습니다. Helm은 매니페스트 묶음을 **release**라는 한 단위로 다룹니다 — 이름이 붙고, revision이 매겨지고, 설치·업그레이드·롤백·삭제가 그 단위로 일어납니다. 이 편은 같은 앱(Deployment·Service·ConfigMap)을 `kubectl apply -f`로 한 번, `helm install`로 한 번 배포해 라이프사이클의 차이를 손으로 확인합니다. 산출물은 "두 방식의 라이프사이클 차이를 직접 본 재현 가능한 기록"과 "release가 왜 한 단위인가에 대한 한 줄 정의"입니다.
 
 ## 핵심 다이어그램
 
@@ -80,7 +80,7 @@ kubectl config set-context --current --namespace=rosa-lab
 | `manifests/raw/` | `kubectl apply -f` 대상 — Deployment·Service·ConfigMap 원본 |
 | `manifests/chart/` | 같은 매니페스트를 release로 묶은 최소 chart (`Chart.yaml` + `templates/`) |
 
-> `manifests/chart/templates/`의 세 파일은 `manifests/raw/`와 글자 그대로 같습니다. 차이는 오직 "어떻게 배포하느냐"뿐이라, 두 방식의 라이프사이클을 같은 매니페스트로 비교할 수 있습니다. chart가 무엇으로 이뤄지는지(`Chart.yaml`·`values.yaml`·`templates/`)는 5편에서 해부합니다. 이 편에서 `Chart.yaml`은 helm이 이 디렉터리를 chart로 인식하게 하는 최소 표식일 뿐입니다.
+> `manifests/chart/templates/`의 세 파일은 `manifests/raw/`와 글자 그대로 같습니다. 차이는 오직 "어떻게 배포하느냐"뿐이라, 두 방식의 라이프사이클을 같은 매니페스트로 비교할 수 있습니다. 이 편에서 `Chart.yaml`은 helm이 이 디렉터리를 chart로 인식하게 하는 최소 표식일 뿐입니다.
 >
 > 세 객체는 일부러 느슨하게 묶었습니다 — Deployment는 ConfigMap을 `optional: true`로 참조하므로, ConfigMap을 빼도 Pod가 깨지지 않습니다. 관심사는 "set을 어떻게 다루느냐"이지 객체 간 배선이 아닙니다.
 
@@ -232,7 +232,7 @@ NAME         DATA   AGE
 web-config   1      1s
 ```
 
-**ConfigMap이 다시 생겼습니다.** 주목할 점은, 방금 `rm`으로 지운 템플릿 파일을 복구하지 않았다는 것입니다 — rollback은 로컬 파일이 아니라 **release에 저장된 revision 1의 매니페스트**에서 복원합니다. 즉 helm은 각 revision의 렌더 결과를 클러스터 어딘가에 들고 있습니다. 어디에, 어떤 형태로 저장하기에 이게 가능한지는 4편에서 봅니다.
+**ConfigMap이 다시 생겼습니다.** 주목할 점은, 방금 `rm`으로 지운 템플릿 파일을 복구하지 않았다는 것입니다 — rollback은 로컬 파일이 아니라 **release에 저장된 revision 1의 매니페스트**에서 복원합니다. 즉 helm은 각 revision의 렌더 결과를 클러스터 어딘가에 들고 있습니다.
 
 ### helm uninstall — 묶음을 한 번에
 
@@ -277,5 +277,5 @@ kind delete cluster --name rosa-lab
 - 같은 앱(Deployment·Service·ConfigMap)을 `kubectl apply -f`와 `helm install`로 각각 배포하고, **객체 집합의 변경·되돌리기·삭제**에서 무엇이 다른지 손으로 확인한 재현 가능한 기록.
 - `apply`는 객체 단위라 "이전 집합"이 없어 빠진 객체가 orphan으로 남고, 설치 목록·이력·rollback이 없다는 것을 직접 본 상태.
 - `helm`은 매니페스트 묶음을 **release**라는 한 단위로 다루며, `helm list`(설치 목록)·`helm upgrade`(set diff로 정리)·`helm history`·`helm rollback`(이력 복원)·`helm uninstall`(묶음 제거)이 모두 그 단위로 동작함을 확인한 상태.
-- `helm rollback`이 로컬 파일이 아니라 **release에 저장된 revision**에서 복원한다는 것을 보고, "release는 클러스터 어딘가에 저장된다"는 사실까지만 확인한 상태 — 저장 위치·형태는 4편.
+- `helm rollback`이 로컬 파일이 아니라 **release에 저장된 revision**에서 복원한다는 것을 보고, "release는 클러스터 어딘가에 저장된다"는 사실을 확인한 상태.
 - release 한 줄 정의: **이름이 붙고 revision이 매겨진 매니페스트 묶음, 설치·업그레이드·롤백·삭제의 단위.**
