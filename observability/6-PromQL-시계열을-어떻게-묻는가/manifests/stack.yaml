@@ -1,0 +1,127 @@
+# PromQL을 물어볼 살아 있는 시계열을 만든다.
+# - web: http_requests_total counter와 http_request_duration_seconds 히스토그램을 낸다
+# - prometheus: 5초마다 web을 긁어 시계열로 쌓는다(static_configs)
+# - load: 끊임없이 9번은 "/"(200), 1번은 "/err"(404)를 호출해 약 10% 에러율을 만든다
+#   → rate·비율·집계 쿼리에 쓸 안정적인 흐름이 생긴다
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: app
+          image: quay.io/brancz/prometheus-example-app:v0.5.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: {cpu: 50m, memory: 32Mi}
+            limits: {cpu: 200m, memory: 64Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: rosa-lab
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: rosa-lab
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+    scrape_configs:
+      - job_name: web
+        static_configs:
+          - targets: ['web:8080']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.54.1
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load
+  template:
+    metadata:
+      labels:
+        app: load
+    spec:
+      containers:
+        - name: load
+          image: busybox:1.36
+          command: ["sh", "-c"]
+          args:
+            - |
+              while true; do
+                for i in 1 2 3 4 5 6 7 8 9; do wget -qO- web:8080/ >/dev/null 2>&1; done
+                wget -qO- web:8080/err >/dev/null 2>&1
+                sleep 0.2
+              done
+          resources:
+            requests: {cpu: 25m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 32Mi}
