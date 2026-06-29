@@ -1,0 +1,57 @@
+# 노드 자원의 출처. node-exporter는 노드의 /proc·/sys를 읽어 node_* metric으로 번역한다.
+# 노드 자신은 Prometheus를 모른다 — exporter가 옆에서 커널 정보를 metric 모양으로 바꿔 낼 뿐이다.
+# 노드마다 하나씩 도는 DaemonSet으로, host의 /proc·/sys·/ 를 읽기 전용으로 마운트한다.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: rosa-lab
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+        - name: node-exporter
+          image: quay.io/prometheus/node-exporter:v1.8.2
+          args:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+            - --path.rootfs=/host/root
+          ports:
+            - name: metrics
+              containerPort: 9100
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          volumeMounts:
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: sys
+              mountPath: /host/sys
+              readOnly: true
+            - name: root
+              mountPath: /host/root
+              readOnly: true
+              mountPropagation: HostToContainer
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: root
+          hostPath:
+            path: /

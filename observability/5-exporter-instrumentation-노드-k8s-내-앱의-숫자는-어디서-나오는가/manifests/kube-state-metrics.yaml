@@ -1,0 +1,85 @@
+# 쿠버네티스 오브젝트 상태의 출처. kube-state-metrics는 API 서버에서 오브젝트를 list/watch해
+# 그 상태(Deployment의 spec/status replica 수, Pod phase 등)를 kube_* metric으로 번역한다.
+# 오브젝트가 바뀌면 metric도 따라 바뀐다 — 자기가 세는 게 아니라 API 상태를 비추는 거울이다.
+# 그래서 API를 읽을 권한(ClusterRole, list/watch)이 필요하다.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-state-metrics
+  namespace: rosa-lab
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kube-state-metrics-rosa
+rules:
+  - apiGroups: [""]
+    resources: [pods, services, nodes, namespaces, endpoints, configmaps, secrets, replicationcontrollers, persistentvolumeclaims, persistentvolumes, resourcequotas, limitranges]
+    verbs: [list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, daemonsets, statefulsets]
+    verbs: [list, watch]
+  - apiGroups: [batch]
+    resources: [jobs, cronjobs]
+    verbs: [list, watch]
+  - apiGroups: [autoscaling]
+    resources: [horizontalpodautoscalers]
+    verbs: [list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kube-state-metrics-rosa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-state-metrics-rosa
+subjects:
+  - kind: ServiceAccount
+    name: kube-state-metrics
+    namespace: rosa-lab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-state-metrics
+  template:
+    metadata:
+      labels:
+        app: kube-state-metrics
+    spec:
+      serviceAccountName: kube-state-metrics
+      containers:
+        - name: ksm
+          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics
+  namespace: rosa-lab
+  labels:
+    app: kube-state-metrics
+spec:
+  selector:
+    app: kube-state-metrics
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
