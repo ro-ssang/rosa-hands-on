@@ -1,0 +1,67 @@
+# 긁어가는 쪽. static_configs로 타깃 주소를 손으로 적었다 — kubernetes 자동 발견도,
+# Operator도 없이 plain Prometheus가 그 주소의 /metrics를 주기적으로 가져온다(pull).
+# pushgateway job의 honor_labels: true는 push된 job/instance label을 덮어쓰지 않고 그대로 둔다.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: rosa-lab
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+    scrape_configs:
+      - job_name: web
+        static_configs:
+          - targets: ['web:8080']
+      - job_name: pushgateway
+        honor_labels: true
+        static_configs:
+          - targets: ['pushgateway:9091']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.54.1
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090

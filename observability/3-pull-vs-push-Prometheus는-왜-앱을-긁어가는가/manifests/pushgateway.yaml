@@ -1,0 +1,41 @@
+# push의 예외 경로. 짧게 살다 죽는 배치 작업은 긁힐 시간이 없어, 끝나기 전에 여기로 밀어 넣는다.
+# Pushgateway는 마지막으로 받은 값을 들고 있고, Prometheus는 이 Pushgateway를 pull한다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pushgateway
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pushgateway
+  template:
+    metadata:
+      labels:
+        app: pushgateway
+    spec:
+      containers:
+        - name: pushgateway
+          image: prom/pushgateway:v1.10.0
+          ports:
+            - containerPort: 9091
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pushgateway
+  namespace: rosa-lab
+spec:
+  selector:
+    app: pushgateway
+  ports:
+    - port: 9091
+      targetPort: 9091

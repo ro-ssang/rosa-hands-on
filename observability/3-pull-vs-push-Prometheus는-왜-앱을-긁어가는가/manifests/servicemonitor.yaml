@@ -1,0 +1,14 @@
+# ServiceMonitor는 kubernetes 기본 리소스도, Prometheus 자체 기능도 아니다.
+# Prometheus Operator가 설치한 CRD다. Operator(와 그 CRD)가 없는 클러스터에 이걸 apply하면
+# "no matches for kind ServiceMonitor"로 거절당한다 — 그게 이 매니페스트의 역할이다.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web
+  namespace: rosa-lab
+spec:
+  selector:
+    matchLabels:
+      app: web
+  endpoints:
+    - port: http
