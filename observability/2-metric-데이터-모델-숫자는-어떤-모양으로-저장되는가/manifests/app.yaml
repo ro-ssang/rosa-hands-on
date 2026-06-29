@@ -1,0 +1,42 @@
+# 살아있는 scrape 대상. prometheus-example-app은 "/"에 200, 그 외 경로에 404를 돌려주고
+# http_requests_total{code,method} counter와 http_request_duration_seconds 히스토그램,
+# 그리고 version gauge를 노출 포맷으로 낸다. counter가 호출마다 누적되는 것을 직접 본다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: app
+          image: quay.io/brancz/prometheus-example-app:v0.5.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: rosa-lab
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 8080
+      targetPort: 8080

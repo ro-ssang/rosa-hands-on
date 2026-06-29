@@ -1,0 +1,82 @@
+# 읽기용 exposition 스냅샷. 한 "checkout" 서비스의 /metrics 한 장면을 손으로 작성해
+# counter·gauge·histogram(+exemplar)·summary 네 모양을 한 화면에서 비교할 수 있게 둔다.
+# 살아있는 app.yaml이 내지 않는 모양(분포가 퍼진 histogram, summary, exemplar)을 채운다.
+# nginx가 이 텍스트를 그대로 서빙하고, wget으로 한 줄씩 읽는다.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-sample
+  namespace: rosa-lab
+data:
+  metrics-sample.txt: |
+    # HELP http_requests_total Total HTTP requests handled, by status code.
+    # TYPE http_requests_total counter
+    http_requests_total{code="200",method="get"} 4820
+    http_requests_total{code="500",method="get"} 31
+    # HELP inflight_requests Requests being handled right now.
+    # TYPE inflight_requests gauge
+    inflight_requests 7
+    # HELP http_request_duration_seconds Latency of HTTP requests, in seconds.
+    # TYPE http_request_duration_seconds histogram
+    http_request_duration_seconds_bucket{le="0.1"} 24
+    http_request_duration_seconds_bucket{le="0.3"} 33
+    http_request_duration_seconds_bucket{le="1.2"} 47 # {trace_id="a1b2c3d4e5f60718"} 1.07 1719300000.0
+    http_request_duration_seconds_bucket{le="5"} 50
+    http_request_duration_seconds_bucket{le="+Inf"} 50
+    http_request_duration_seconds_sum 41.7
+    http_request_duration_seconds_count 50
+    # HELP rpc_duration_seconds RPC latency with client-computed quantiles.
+    # TYPE rpc_duration_seconds summary
+    rpc_duration_seconds{quantile="0.5"} 0.21
+    rpc_duration_seconds{quantile="0.9"} 0.84
+    rpc_duration_seconds{quantile="0.99"} 1.98
+    rpc_duration_seconds_sum 41.7
+    rpc_duration_seconds_count 50
+    # EOF
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample
+  template:
+    metadata:
+      labels:
+        app: sample
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: sample
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              cpu: 25m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
+      volumes:
+        - name: sample
+          configMap:
+            name: metrics-sample
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample
+  namespace: rosa-lab
+spec:
+  selector:
+    app: sample
+  ports:
+    - port: 80
+      targetPort: 80
