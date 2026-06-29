@@ -1,0 +1,107 @@
+# 수집 agent. Grafana Alloy가 쿠버네티스 Pod 로그를 tail해 label을 붙여 Loki로 push한다.
+# (이전 agent Promtail은 유지보수 모드 — 새 구성은 Alloy를 쓴다.)
+# discovery.kubernetes로 Pod를 찾고, relabel로 namespace·app·pod 를 label로 붙인다 —
+# 이 적은 저카디널리티 label만 인덱스가 되고, 로그 본문은 인덱싱되지 않는다.
+# Pod와 그 로그를 읽으려면 RBAC(get/list/watch pods·pods/log)이 필요하다.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alloy
+  namespace: rosa-lab
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alloy-rosa
+rules:
+  - apiGroups: [""]
+    resources: [pods, pods/log, namespaces, nodes, nodes/proxy, services, endpoints]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: alloy-rosa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: alloy-rosa
+subjects:
+  - kind: ServiceAccount
+    name: alloy
+    namespace: rosa-lab
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: rosa-lab
+data:
+  config.alloy: |
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+
+    discovery.relabel "pods" {
+      targets = discovery.kubernetes.pods.targets
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app"]
+        target_label  = "app"
+      }
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+    }
+
+    loki.source.kubernetes "pods" {
+      targets    = discovery.relabel.pods.output
+      forward_to = [loki.write.default.receiver]
+    }
+
+    loki.write "default" {
+      endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alloy
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alloy
+  template:
+    metadata:
+      labels:
+        app: alloy
+    spec:
+      serviceAccountName: alloy
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.5.1
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --storage.path=/tmp/alloy
+            - --server.http.listen-addr=0.0.0.0:12345
+          ports:
+            - containerPort: 12345
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 256Mi}
+      volumes:
+        - name: config
+          configMap:
+            name: alloy-config

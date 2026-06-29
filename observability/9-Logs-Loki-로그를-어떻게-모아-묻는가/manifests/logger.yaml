@@ -1,0 +1,35 @@
+# 로그를 내는 앱. 매초 JSON 한 줄을 stdout으로 낸다 — 대부분 info(code 200),
+# 5번째마다 warn(404), 11번째마다 error(500). level·code·path·seq가 본문(content)에 담긴다.
+# 이 본문 필드들은 Loki label로 만들지 않는다(고카디널리티) — LogQL로 query-time에 거른다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logger
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logger
+  template:
+    metadata:
+      labels:
+        app: logger
+    spec:
+      containers:
+        - name: logger
+          image: busybox:1.36
+          command: ["sh", "-c"]
+          args:
+            - |
+              i=0
+              while true; do
+                i=$((i+1))
+                echo "{\"level\":\"info\",\"msg\":\"request handled\",\"code\":200,\"path\":\"/\",\"seq\":$i}"
+                if [ $((i % 5)) -eq 0 ]; then echo "{\"level\":\"warn\",\"msg\":\"not found\",\"code\":404,\"path\":\"/missing\",\"seq\":$i}"; fi
+                if [ $((i % 11)) -eq 0 ]; then echo "{\"level\":\"error\",\"msg\":\"upstream failed\",\"code\":500,\"path\":\"/checkout\",\"seq\":$i}"; fi
+                sleep 1
+              done
+          resources:
+            requests: {cpu: 25m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 32Mi}
