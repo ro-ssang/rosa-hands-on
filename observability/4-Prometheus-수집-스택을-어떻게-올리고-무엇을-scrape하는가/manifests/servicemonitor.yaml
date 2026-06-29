@@ -1,0 +1,18 @@
+# 타깃 주소를 적지 않는다. "app=web Service의 http 포트를 5초마다 긁어라"라고 선언만 한다.
+# Operator가 이 선언을 읽어 kubernetes service discovery 기반 scrape 설정을 대신 만든다.
+# labels.release=monitoring 은 스택 Prometheus의 serviceMonitorSelector(release=monitoring)와
+# 맞춰야 하는 값 — 이 label이 없으면 Operator가 무시한다.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web
+  namespace: rosa-lab
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: web
+  endpoints:
+    - port: http
+      interval: 5s

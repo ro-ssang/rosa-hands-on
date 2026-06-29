@@ -1,0 +1,45 @@
+# 스택에 추가할 내 앱. Service에 app=web label과 이름 있는 포트(http)를 둔다 —
+# ServiceMonitor가 이 label로 Service를 고르고, 이 포트 이름으로 endpoint를 찾는다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: app
+          image: quay.io/brancz/prometheus-example-app:v0.5.0
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: rosa-lab
+  labels:
+    app: web
+spec:
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
