@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: allowed
+  namespace: argocd
+spec:
+  project: team-a                    # team-a 경계 안
+  source:                            # 허용된 repo ✓
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: guestbook                  # Service + Deployment만 (허용 리소스 ✓)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: team-a-dev            # team-a-* 패턴에 맞음 ✓
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ CreateNamespace=true ]

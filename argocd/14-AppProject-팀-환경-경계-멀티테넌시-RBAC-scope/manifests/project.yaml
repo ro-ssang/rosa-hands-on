@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: team-a
+  namespace: argocd
+spec:
+  description: team-a 경계 — 정해진 repo·namespace·리소스만 허용
+  sourceRepos:                       # 어디서 배포해도 되나
+    - https://github.com/argoproj/argocd-example-apps.git
+  destinations:                      # 어디로 배포해도 되나
+    - server: https://kubernetes.default.svc
+      namespace: 'team-a-*'          # team-a-* namespace만
+  clusterResourceWhitelist: []       # 클러스터 범위 리소스(ClusterRole 등) 전면 금지
+  namespaceResourceWhitelist:        # namespace 범위는 이 종류만 허용
+    - group: ""
+      kind: Service
+    - group: apps
+      kind: Deployment
+  roles:                             # project-scoped RBAC
+    - name: deployer
+      description: team-a 앱을 sync만 할 수 있는 역할
+      policies:
+        - p, proj:team-a:deployer, applications, sync, team-a/*, allow
+      groups:
+        - team-a-oncall              # 이 그룹(OIDC) 멤버에게 위 role 부여
