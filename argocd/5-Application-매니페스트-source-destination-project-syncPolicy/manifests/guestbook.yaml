@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+  namespace: argocd            # Application 객체는 argocd ns에 산다 (앱이 배포될 곳이 아님)
+spec:
+  project: default             # 어느 경계(AppProject) 안에서 허용되는가
+  source:                      # 어디서 — 원하는 상태의 출처
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD       # 어느 시점 (branch · tag · commit SHA)
+    path: guestbook            # repo 안 어느 디렉터리
+  destination:                 # 어디로 — 어느 클러스터·namespace에 적용
+    server: https://kubernetes.default.svc
+    namespace: rosa-lab
+  syncPolicy:                  # 어떻게 맞출지
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
