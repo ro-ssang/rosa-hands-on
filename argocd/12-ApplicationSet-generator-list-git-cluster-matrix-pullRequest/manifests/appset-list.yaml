@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: web-envs
+  namespace: argocd
+spec:
+  goTemplate: true               # {{.env}} 같은 Go 템플릿 문법 사용
+  generators:
+    - list:                      # 직접 적은 목록으로 펼친다
+        elements:
+          - env: dev
+          - env: stg
+          - env: prd
+  template:                      # 각 element가 이 틀을 채워 Application이 된다
+    metadata:
+      name: 'web-{{.env}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/argoproj/argocd-example-apps.git
+        targetRevision: HEAD
+        path: guestbook
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'web-{{.env}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions: [ CreateNamespace=true ]

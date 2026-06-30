@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: web-matrix
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - matrix:                    # 두 generator의 곱집합 (env × region)
+        generators:
+          - list:
+              elements:
+                - env: dev
+                - env: prd
+          - list:
+              elements:
+                - region: apne2
+                - region: use1
+  template:
+    metadata:
+      name: 'web-{{.env}}-{{.region}}'   # 2 × 2 = 4개 Application
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/argoproj/argocd-example-apps.git
+        targetRevision: HEAD
+        path: guestbook
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'web-{{.env}}-{{.region}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions: [ CreateNamespace=true ]

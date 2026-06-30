@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: web-git
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - git:                       # repo의 디렉터리를 훑어 펼친다
+        repoURL: https://github.com/<you>/gitops.git
+        revision: HEAD
+        directories:
+          - path: env/*          # env/dev, env/stg, env/prd ... 디렉터리마다 1개
+  template:
+    metadata:
+      name: 'web-{{.path.basename}}'   # 디렉터리 이름이 env가 됨
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/<you>/gitops.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'web-{{.path.basename}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions: [ CreateNamespace=true ]
