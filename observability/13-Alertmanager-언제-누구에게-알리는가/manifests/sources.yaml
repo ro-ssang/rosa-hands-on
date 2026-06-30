@@ -1,0 +1,110 @@
+# alert를 발동시킬 메트릭과, 알림을 받아 로그로 남기는 sink.
+# metrics: nginx가 손으로 쓴 /metrics를 서빙 — pod 10개가 unhealthy(=1)인 상황과,
+#          inhibition 시연용 service_critical / service_degraded(checkout)를 낸다.
+# sink: webhook 알림을 받아 요청을 통째로 로그로 남긴다(알림이 몇 건 오는지 센다).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-file
+  namespace: rosa-lab
+data:
+  metrics: |
+    # HELP pod_unhealthy 1 if pod is unhealthy
+    # TYPE pod_unhealthy gauge
+    pod_unhealthy{pod="web-0"} 1
+    pod_unhealthy{pod="web-1"} 1
+    pod_unhealthy{pod="web-2"} 1
+    pod_unhealthy{pod="web-3"} 1
+    pod_unhealthy{pod="web-4"} 1
+    pod_unhealthy{pod="web-5"} 1
+    pod_unhealthy{pod="web-6"} 1
+    pod_unhealthy{pod="web-7"} 1
+    pod_unhealthy{pod="web-8"} 1
+    pod_unhealthy{pod="web-9"} 1
+    # HELP service_critical 1 if service is down
+    # TYPE service_critical gauge
+    service_critical{service="checkout"} 1
+    # HELP service_degraded 1 if service is degraded
+    # TYPE service_degraded gauge
+    service_degraded{service="checkout"} 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics
+  template:
+    metadata:
+      labels:
+        app: metrics
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: m
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests: {cpu: 25m, memory: 16Mi}
+            limits: {cpu: 100m, memory: 32Mi}
+      volumes:
+        - name: m
+          configMap:
+            name: metrics-file
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics
+  namespace: rosa-lab
+spec:
+  selector:
+    app: metrics
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sink
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sink
+  template:
+    metadata:
+      labels:
+        app: sink
+    spec:
+      containers:
+        - name: echo
+          image: mendhak/http-https-echo:33
+          env:
+            - {name: HTTP_PORT, value: "8080"}
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: {cpu: 25m, memory: 32Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sink
+  namespace: rosa-lab
+spec:
+  selector:
+    app: sink
+  ports:
+    - port: 8080
+      targetPort: 8080

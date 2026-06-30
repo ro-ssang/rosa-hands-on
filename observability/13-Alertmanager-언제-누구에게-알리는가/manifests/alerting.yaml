@@ -1,0 +1,156 @@
+# Prometheus가 rule로 alert를 발동해 Alertmanager로 보내고, Alertmanager가
+# routing·grouping·deduplication·inhibition으로 알림을 정리해 webhook(sink)으로 보낸다.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: rosa-lab
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    rule_files:
+      - /etc/prometheus/rules.yml
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets: ['alertmanager:9093']
+    scrape_configs:
+      - job_name: metrics
+        static_configs:
+          - targets: ['metrics:80']
+  rules.yml: |
+    groups:
+      - name: demo
+        rules:
+          # pod 10개가 동시에 unhealthy -> alert 10개가 발동한다
+          - alert: PodUnhealthy
+            expr: pod_unhealthy == 1
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod {{ $labels.pod }} unhealthy"
+          # 같은 service의 상위(critical) 사건 — 아래 warning을 inhibit한다
+          - alert: ServiceDown
+            expr: service_critical == 1
+            labels:
+              severity: critical
+          - alert: ServiceDegraded
+            expr: service_degraded == 1
+            labels:
+              severity: warning
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.54.1
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: c
+              mountPath: /etc/prometheus
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+      volumes:
+        - name: c
+          configMap:
+            name: prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: rosa-lab
+data:
+  alertmanager.yml: |
+    route:
+      group_by: ['alertname']     # 같은 alertname은 한 그룹으로 묶는다
+      group_wait: 2s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: webhook
+      routes:
+        - matchers: ['severity="critical"']   # critical은 별도 경로로 라우팅
+          receiver: webhook
+    receivers:
+      - name: webhook
+        webhook_configs:
+          - url: 'http://sink:8080/'
+            send_resolved: false
+    inhibit_rules:
+      # ServiceDown(critical)이 켜지면 같은 service의 ServiceDegraded(warning)는 억제
+      - source_matchers: ['alertname="ServiceDown"']
+        target_matchers: ['alertname="ServiceDegraded"']
+        equal: ['service']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager:v0.27.0
+          args: ["--config.file=/etc/alertmanager/alertmanager.yml"]
+          ports:
+            - containerPort: 9093
+          volumeMounts:
+            - name: c
+              mountPath: /etc/alertmanager
+          resources:
+            requests: {cpu: 25m, memory: 32Mi}
+            limits: {cpu: 100m, memory: 64Mi}
+      volumes:
+        - name: c
+          configMap:
+            name: alertmanager-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: rosa-lab
+spec:
+  selector:
+    app: alertmanager
+  ports:
+    - port: 9093
+      targetPort: 9093
