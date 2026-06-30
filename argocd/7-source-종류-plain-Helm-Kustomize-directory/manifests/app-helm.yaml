@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: helm
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: helm-guestbook            # Chart.yaml이 있는 디렉터리
+    helm:                           # Argo가 helm template으로 렌더
+      parameters:
+        - name: replicaCount        # chart의 values 키
+          value: "2"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: src-helm
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ CreateNamespace=true ]
