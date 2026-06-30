@@ -1,0 +1,127 @@
+# Grafana를 provisioning으로 띄운다 — datasource·folder·dashboard·변수를 전부 파일로 선언한다.
+# 시작 시 이 파일들을 읽어 구성하므로, UI 클릭이 한 번도 필요 없다. 관리 단위는 클릭이 아니라 이 파일들이다.
+#
+# datasource: Prometheus를 코드로 등록.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: rosa-lab
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+---
+# dashboard provider: 이 경로의 JSON들을 'rosa-lab' folder로 로드한다.
+# allowUiUpdates: false — UI에서 provisioned 대시보드를 저장할 수 없게 막는다(파일이 원본).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dash-provider
+  namespace: rosa-lab
+data:
+  provider.yaml: |
+    apiVersion: 1
+    providers:
+      - name: rosa-lab
+        folder: rosa-lab
+        type: file
+        allowUiUpdates: false
+        options:
+          path: /var/lib/grafana/dashboards
+---
+# dashboard 자체. JSON은 대시보드의 표현 형식일 뿐 — 변수($code)와 PromQL 패널을 코드로 둔다.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: rosa-lab
+data:
+  rosa-red.json: |
+    {
+      "uid": "rosa-red",
+      "title": "rosa-lab RED",
+      "tags": ["rosa-lab"],
+      "schemaVersion": 39,
+      "time": {"from": "now-15m", "to": "now"},
+      "templating": {
+        "list": [
+          {
+            "name": "code",
+            "type": "query",
+            "datasource": {"type": "prometheus", "uid": "prometheus"},
+            "query": "label_values(http_requests_total, code)",
+            "refresh": 2,
+            "includeAll": true,
+            "multi": true
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "timeseries",
+          "title": "request rate by code",
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+          "targets": [
+            {"refId": "A", "datasource": {"type": "prometheus", "uid": "prometheus"},
+             "expr": "sum by(code) (rate(http_requests_total{code=~\"$code\"}[1m]))",
+             "legendFormat": "{{code}}"}
+          ]
+        }
+      ]
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.3.1
+          env:
+            - {name: GF_SECURITY_ADMIN_USER, value: admin}
+            - {name: GF_SECURITY_ADMIN_PASSWORD, value: admin}
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - {name: ds, mountPath: /etc/grafana/provisioning/datasources}
+            - {name: dp, mountPath: /etc/grafana/provisioning/dashboards}
+            - {name: db, mountPath: /var/lib/grafana/dashboards}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+      volumes:
+        - {name: ds, configMap: {name: grafana-datasources}}
+        - {name: dp, configMap: {name: grafana-dash-provider}}
+        - {name: db, configMap: {name: grafana-dashboards}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: rosa-lab
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
