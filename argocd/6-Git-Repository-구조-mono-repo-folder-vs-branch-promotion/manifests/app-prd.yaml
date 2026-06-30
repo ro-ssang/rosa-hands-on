@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-prd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<you>/gitops.git   # dev와 같은 repo
+    targetRevision: HEAD
+    path: env/prd                                    # prd 폴더만 다름
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prd
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ CreateNamespace=true ]
