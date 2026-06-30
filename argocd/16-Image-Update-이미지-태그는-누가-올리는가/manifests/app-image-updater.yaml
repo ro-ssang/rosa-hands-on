@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web
+  namespace: argocd
+  annotations:
+    # Argo CD Image Updater가 읽는 설정 — 레지스트리를 폴링해 새 태그를 찾는다
+    argocd-image-updater.argoproj.io/image-list: web=nginx
+    argocd-image-updater.argoproj.io/web.update-strategy: semver          # semver 규칙으로 최신 선택
+    argocd-image-updater.argoproj.io/web.allow-tags: regexp:^1\.27\..*    # 1.27.x 범위 안에서만
+    argocd-image-updater.argoproj.io/write-back-method: git               # ★ Git에 커밋 (클러스터 직접 X)
+    argocd-image-updater.argoproj.io/git-branch: main
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<you>/gitops.git
+    targetRevision: HEAD
+    path: env/prd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: web-prd
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ CreateNamespace=true ]

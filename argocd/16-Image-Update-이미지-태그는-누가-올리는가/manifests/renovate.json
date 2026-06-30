@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "kubernetes": {
+    "managerFilePatterns": ["/env/.+\\.ya?ml$/"]
+  },
+  "packageRules": [
+    {
+      "description": "prd 이미지 업데이트는 PR로만 (자동 머지 금지)",
+      "matchFileNames": ["env/prd/**"],
+      "automerge": false
+    },
+    {
+      "description": "dev 패치 업데이트는 자동 머지 허용",
+      "matchFileNames": ["env/dev/**"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    }
+  ]
+}
