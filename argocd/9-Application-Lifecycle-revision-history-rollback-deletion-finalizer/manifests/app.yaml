@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lifecycle
+  namespace: argocd
+  # finalizer 없음 — 삭제 시 동작 차이를 보기 위해 일부러 뺀다 (본문에서 추가)
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: helm-guestbook
+    helm:
+      parameters:
+        - name: replicaCount
+          value: "1"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: lifecycle-demo
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    # automated 없음 — manual. rollback을 보려면 자동 sync가 꺼져 있어야 한다.
