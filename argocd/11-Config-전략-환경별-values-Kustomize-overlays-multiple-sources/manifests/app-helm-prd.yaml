@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-prd-helm
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/<you>/gitops.git
+    targetRevision: HEAD
+    path: helm/web
+    helm:
+      valueFiles:
+        - values.yaml         # 공통 기본값
+        - values-prd.yaml     # prd 차이만 위에 덮음 (replicaCount: 4)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: web-prd
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ CreateNamespace=true ]

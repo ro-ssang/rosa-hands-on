@@ -1,0 +1,2 @@
+# dev 환경 차이만 — 나머지는 values.yaml 기본값 사용
+replicaCount: 1

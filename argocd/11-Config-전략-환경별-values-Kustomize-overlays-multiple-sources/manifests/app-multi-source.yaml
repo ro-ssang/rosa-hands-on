@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-prd-multi
+  namespace: argocd
+spec:
+  project: default
+  # chart는 외부/별도 repo, 값(values)은 내 config repo — 둘을 합쳐 렌더
+  sources:
+    - repoURL: https://github.com/<you>/charts.git    # chart만 있는 repo
+      targetRevision: HEAD
+      path: web
+      helm:
+        valueFiles:
+          - $values/env/prd/values.yaml                # 아래 ref:values repo의 파일
+    - repoURL: https://github.com/<you>/config.git     # 환경별 값만 있는 repo
+      targetRevision: HEAD
+      ref: values                                       # 위에서 $values로 참조
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: web-prd-multi
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ CreateNamespace=true ]

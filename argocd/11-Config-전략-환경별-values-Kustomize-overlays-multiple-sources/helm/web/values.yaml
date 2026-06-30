@@ -1,0 +1,9 @@
+# 공통 기본값 — 환경별 파일이 이 위에 덮는다
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.27.0"
+
+service:
+  port: 80

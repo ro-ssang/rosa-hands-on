@@ -1,0 +1,5 @@
+# prd 환경 차이만 — replica를 늘리고 이미지 태그를 고정
+replicaCount: 4
+
+image:
+  tag: "1.27.0"

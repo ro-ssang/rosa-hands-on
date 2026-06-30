@@ -1,0 +1,6 @@
+apiVersion: v2
+name: web
+description: 환경별 config 비교용 web chart
+type: application
+version: 0.1.0
+appVersion: "1.27.0"
