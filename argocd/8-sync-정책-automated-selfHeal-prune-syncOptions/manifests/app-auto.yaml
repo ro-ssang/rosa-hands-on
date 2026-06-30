@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: policy
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: guestbook
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: policy-demo
+  syncPolicy:
+    automated:            # 자동 sync 켬
+      prune: true         # Git에서 사라진 리소스 삭제
+      selfHeal: true      # live가 어긋나면 되돌림
+    retry:                # sync 실패 시 재시도 정책
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+    syncOptions:
+      - CreateNamespace=true     # dest namespace가 없으면 생성
+      - ApplyOutOfSyncOnly=true  # 바뀐 리소스만 apply
+      - PruneLast=true           # 다른 리소스 sync 후 마지막에 prune
