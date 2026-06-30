@@ -1,0 +1,6 @@
+apiVersion: v2
+name: web
+description: 최소 web chart — Argo CD로 배포하기 위한 예시
+type: application
+version: 0.1.0          # chart 자체의 버전
+appVersion: "1.27.0"   # 담고 있는 앱(nginx)의 버전
