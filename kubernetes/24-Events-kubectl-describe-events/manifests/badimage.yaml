@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badimage
+  namespace: rosa-lab
+  labels:
+    app: badimage
+spec:
+  containers:
+    - name: app
+      image: nginx:does-not-exist-9999

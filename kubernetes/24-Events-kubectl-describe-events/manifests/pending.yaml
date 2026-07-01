@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pending
+  namespace: rosa-lab
+  labels:
+    app: pending
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27-alpine
+      resources:
+        requests:
+          cpu: "1000"   # 노드 CPU를 크게 넘겨 스케줄 불가 → FailedScheduling
