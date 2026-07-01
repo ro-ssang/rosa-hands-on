@@ -1,0 +1,32 @@
+# stdout·stderr로 로그를 꾸준히 내는 워크로드.
+# 2초마다 stdout에 INFO 한 줄, 5번째마다 stderr에 ERROR 한 줄.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logger
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logger
+  template:
+    metadata:
+      labels:
+        app: logger
+    spec:
+      containers:
+        - name: app
+          image: busybox
+          command: ["sh", "-c"]
+          args:
+            - |
+              i=0
+              while true; do
+                i=$((i+1))
+                echo "$(date -u +%FT%TZ) INFO  request handled seq=$i"
+                if [ $((i % 5)) -eq 0 ]; then
+                  echo "$(date -u +%FT%TZ) ERROR upstream timeout seq=$i" >&2
+                fi
+                sleep 2
+              done
