@@ -1,0 +1,6 @@
+apiVersion: v2
+name: hook-demo
+description: pre/post-install hook · hook-weight · delete-policy를 보이는 chart
+type: application
+version: 0.1.0
+appVersion: "1.0"
