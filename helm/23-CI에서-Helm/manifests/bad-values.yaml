@@ -1,0 +1,3 @@
+# schema를 어기는 값 — CI의 schema 단계가 이걸 걸러야 한다.
+# replicaCount 최대는 10인데 99를 넣었다.
+replicaCount: 99
