@@ -1,0 +1,28 @@
+apiVersion: v2
+name: platform
+description: subchart를 품는 부모 chart (dependencies·condition·alias·import-values)
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  # 늘 포함 + import-values로 backend의 config를 부모 backendConfig로 끌어올린다.
+  - name: backend
+    version: "0.1.0"
+    repository: "file://../charts-src/backend"
+    import-values:
+      - child: config
+        parent: backendConfig
+
+  # condition으로 켜고 끈다 (cache.enabled).
+  - name: cache
+    version: "0.1.0"
+    repository: "file://../charts-src/cache"
+    condition: cache.enabled
+
+  # 같은 cache chart를 alias로 한 번 더 (cache-secondary.enabled로 제어).
+  - name: cache
+    version: "0.1.0"
+    repository: "file://../charts-src/cache"
+    alias: cache-secondary
+    condition: cache-secondary.enabled

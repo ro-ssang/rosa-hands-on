@@ -1,0 +1,5 @@
+apiVersion: v2
+name: backend
+description: 부모가 품는 subchart (import-values 소스)
+type: application
+version: 0.1.0

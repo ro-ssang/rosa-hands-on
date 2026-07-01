@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.label }}
+data:
+  chart-name: {{ .Chart.Name | quote }}
+  label: {{ .Values.label | quote }}

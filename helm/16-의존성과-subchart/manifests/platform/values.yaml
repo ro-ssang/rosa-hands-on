@@ -1,0 +1,9 @@
+# cache subchart 값 (condition: cache.enabled)
+cache:
+  enabled: true
+  label: primary
+
+# alias된 두 번째 cache 값 (condition: cache-secondary.enabled)
+cache-secondary:
+  enabled: true
+  label: secondary

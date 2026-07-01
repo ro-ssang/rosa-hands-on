@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-platform
+data:
+  # backend subchart가 import-values로 끌어올린 값 — 부모가 그대로 본다.
+  imported-db-host: {{ .Values.backendConfig.DB_HOST | default "(none)" | quote }}
+  imported-db-port: {{ .Values.backendConfig.DB_PORT | default "(none)" | quote }}
