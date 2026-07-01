@@ -1,0 +1,8 @@
+# umbrella는 subchart 값을 각 이름 아래에 둔다.
+# 여기서 한 subchart 값만 바꿔도, 배포/롤백은 platform release 하나로 묶여 움직인다.
+frontend:
+  message: "frontend v1"
+backend:
+  message: "backend v1"
+cache:
+  message: "cache v1"

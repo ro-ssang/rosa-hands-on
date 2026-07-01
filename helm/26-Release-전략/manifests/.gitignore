@@ -1,0 +1,2 @@
+# dependency build로 벤더링되는 subchart 아카이브는 커밋하지 않는다 (Chart.lock으로 재현).
+charts/platform/charts/*.tgz
