@@ -1,0 +1,10 @@
+apiVersion: v2
+name: platform
+description: OCI 레지스트리에서 subchart를 가져오는 부모 chart
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: my-service
+    version: "0.4.0"
+    repository: "oci://localhost:5001/charts"

@@ -1,0 +1,3 @@
+# subchart(my-service) 값은 이 키 아래로 전달된다.
+my-service:
+  replicaCount: 2

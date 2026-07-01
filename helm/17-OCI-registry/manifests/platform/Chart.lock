@@ -1,0 +1,6 @@
+dependencies:
+- name: my-service
+  repository: oci://localhost:5001/charts
+  version: 0.4.0
+digest: sha256:4aa5f3eb86a26ca3510ff7cb432012a4daa02db0a24925a4af0d932dc06c068e
+generated: "2026-07-01T10:59:39.573637+09:00"
