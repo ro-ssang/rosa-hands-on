@@ -1,0 +1,178 @@
+# 카디널리티가 어떻게 폭발하는지 직접 재는 스택.
+# - metrics-gen: 같은 요청을 세 가지 방식으로 노출한다
+#     http_requests_raw_total        : id가 경로에 박힘 -> id마다 시계열 하나(폭발)
+#     http_requests_normalized_total : id를 {id}로 접음 -> 시계열 하나
+#     http_requests_labeled_total    : path x code 두 축의 곱 -> 곱만큼 시계열
+# - prometheus: 위를 scrape하고, 자신도 scrape해 tsdb 시계열 수를 노출.
+#     recording rule로 2000 시계열을 code별 4 시계열로 미리 접는다(사전 집계).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gen-code
+  namespace: rosa-lab
+data:
+  gen.py: |
+    import http.server, os
+
+    RAW = int(os.environ.get("RAW_SERIES", "500"))
+    CODES = ["200", "404", "500", "503"]
+
+    def render():
+        out = []
+        # 원시 경로: 사용자 id마다 시계열 하나 -> 카디널리티 폭발
+        out.append("# TYPE http_requests_raw_total counter")
+        for i in range(RAW):
+            out.append(f'http_requests_raw_total{{path="/users/{i}"}} 1')
+        # 정규화 경로: id를 {id}로 접어 시계열 하나
+        out.append("# TYPE http_requests_normalized_total counter")
+        out.append(f'http_requests_normalized_total{{path="/users/{{id}}"}} {RAW}')
+        # 라벨 한 축이 더 붙으면 곱으로 늘어난다: path x code
+        out.append("# TYPE http_requests_labeled_total counter")
+        for i in range(RAW):
+            for c in CODES:
+                out.append(f'http_requests_labeled_total{{path="/users/{i}",code="{c}"}} 1')
+        return "\n".join(out) + "\n"
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/metrics":
+                body = render().encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; version=0.0.4")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                self.send_response(404)
+                self.end_headers()
+        def log_message(self, *a):
+            pass
+
+    http.server.HTTPServer(("", 8080), H).serve_forever()
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-gen
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics-gen
+  template:
+    metadata:
+      labels:
+        app: metrics-gen
+    spec:
+      containers:
+        - name: gen
+          image: python:3.12-slim
+          command: ["python3", "/app/gen.py"]
+          env:
+            - name: RAW_SERIES
+              value: "500"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: code
+              mountPath: /app
+          resources:
+            requests: {cpu: 25m, memory: 32Mi}
+            limits: {cpu: 200m, memory: 64Mi}
+      volumes:
+        - name: code
+          configMap:
+            name: gen-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-gen
+  namespace: rosa-lab
+spec:
+  selector:
+    app: metrics-gen
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: rosa-lab
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+    rule_files:
+      - /etc/prometheus/rules.yml
+    scrape_configs:
+      - job_name: metrics-gen
+        static_configs:
+          - targets: ['metrics-gen:8080']
+      # 자신도 scrape해야 prometheus_tsdb_head_series(전체 시계열 수)를 쿼리로 볼 수 있다
+      - job_name: prometheus
+        static_configs:
+          - targets: ['localhost:9090']
+  rules.yml: |
+    groups:
+      - name: cost
+        rules:
+          # 사전 집계: path를 버리고 code별로 접는다 -> 2000 시계열이 4 시계열로
+          - record: code:http_requests_labeled:sum
+            expr: sum by (code) (http_requests_labeled_total)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.54.1
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            # retention: 이 창을 넘긴 블록은 삭제된다(로컬 저장 상한)
+            - --storage.tsdb.retention.time=6h
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: c
+              mountPath: /etc/prometheus
+            - name: data
+              mountPath: /prometheus
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+      volumes:
+        - name: c
+          configMap:
+            name: prometheus-config
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: rosa-lab
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
