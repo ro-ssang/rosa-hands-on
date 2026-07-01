@@ -1,0 +1,4 @@
+config:
+  APP: app-b
+  LOG_LEVEL: warn
+  FEATURE_X: "on"

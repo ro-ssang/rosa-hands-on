@@ -1,0 +1,11 @@
+apiVersion: v2
+name: app-b
+description: common library를 가져다 쓰는 또 다른 앱
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: common
+    version: "0.1.0"
+    repository: "file://../common"

@@ -1,0 +1,3 @@
+config:
+  APP: app-a
+  LOG_LEVEL: info

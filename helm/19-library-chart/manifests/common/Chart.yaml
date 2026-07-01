@@ -1,0 +1,5 @@
+apiVersion: v2
+name: common
+description: 여러 chart가 공유하는 공통 템플릿 (설치되지 않는 library chart)
+type: library
+version: 0.1.0
