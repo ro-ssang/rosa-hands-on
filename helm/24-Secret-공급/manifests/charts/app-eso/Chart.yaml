@@ -1,0 +1,6 @@
+apiVersion: v2
+name: app-eso
+description: 비밀 값을 외부 저장소에서 참조하는 chart (External Secrets)
+type: application
+version: 0.1.0
+appVersion: "1.0"

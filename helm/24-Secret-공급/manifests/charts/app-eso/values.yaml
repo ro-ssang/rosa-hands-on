@@ -1,0 +1,6 @@
+# 이 chart에는 비밀 값이 없다 — 어느 저장소의 어느 키를 참조할지만 있다.
+secretStore: fake-store          # 참조할 SecretStore 이름 (클러스터가 미리 갖고 있음)
+remoteKey: /rosa-lab/db-password # 외부 저장소에서의 키 경로 (예: AWS Secrets Manager 경로)
+image:
+  repository: nginx
+  version: "1.28"

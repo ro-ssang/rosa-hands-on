@@ -1,0 +1,14 @@
+# 외부 저장소를 흉내 내는 SecretStore.
+# 실무에선 provider.aws(Secrets Manager)·vault 등이 오지만, 여기선 fake로 하드코딩 값을 돌려준다.
+# 이 값이 "AWS Secrets Manager에 이미 들어 있는 비밀"에 해당한다 — chart 밖, 클러스터 인프라가 갖는다.
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: fake-store
+  namespace: rosa-lab
+spec:
+  provider:
+    fake:
+      data:
+        - key: /rosa-lab/db-password
+          value: from-secrets-manager

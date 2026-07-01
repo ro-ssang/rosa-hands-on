@@ -1,0 +1,6 @@
+apiVersion: v2
+name: app-plain
+description: Secret을 values로 받는 chart (안티패턴·SOPS 암호화 커밋 시연)
+type: application
+version: 0.1.0
+appVersion: "1.0"
