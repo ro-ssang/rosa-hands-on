@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crash
+  namespace: rosa-lab
+  labels:
+    app: crash
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sh", "-c"]
+      args:
+        - |
+          echo "$(date -u +%FT%TZ) starting up"
+          echo "$(date -u +%FT%TZ) loading config from /etc/app/config.yaml"
+          sleep 3
+          echo "$(date -u +%FT%TZ) FATAL config file not found, exiting" >&2
+          exit 1
