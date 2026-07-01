@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-backend
+data:
+  # subchart는 자기 replicaCount만 안다(부모 값과 섞이지 않는다).
+  own-replicaCount: {{ .Values.replicaCount | quote }}
+  # global은 부모에서 내려온 것을 그대로 본다.
+  seen-global-environment: {{ .Values.global.environment | quote }}
+  seen-global-domain: {{ .Values.global.domain | quote }}

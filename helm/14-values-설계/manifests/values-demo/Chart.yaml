@@ -1,0 +1,11 @@
+apiVersion: v2
+name: values-demo
+description: values의 계층·병합·우선순위·global을 렌더로 확인하는 chart
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+# charts/backend/ 를 subchart로 선언한다(global 전파 확인용).
+dependencies:
+  - name: backend
+    version: "0.1.0"

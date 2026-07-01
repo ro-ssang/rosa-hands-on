@@ -1,0 +1,7 @@
+replicaCount: 2
+
+config:
+  LOG_LEVEL: debug
+
+global:
+  environment: staging

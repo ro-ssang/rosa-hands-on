@@ -1,0 +1,2 @@
+# subchart 자신의 기본값. global은 여기 두지 않아도 부모에서 내려온다.
+replicaCount: 1

@@ -1,0 +1,12 @@
+replicaCount: 3
+
+# map의 한 키만 덮는다 — 나머지 키(GREETING·TIMEOUT)는 살아남는다.
+config:
+  LOG_LEVEL: warn
+
+# list는 통째로 대체된다 — alpha·beta는 사라지고 stable만 남는다.
+featureFlags:
+  - stable
+
+global:
+  environment: prod

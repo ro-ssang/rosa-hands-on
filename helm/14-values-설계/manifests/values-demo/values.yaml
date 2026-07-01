@@ -1,0 +1,17 @@
+replicaCount: 1
+
+# map — 키 단위로 깊게 병합된다.
+config:
+  LOG_LEVEL: info
+  GREETING: "hello"
+  TIMEOUT: "30s"
+
+# list — 통째로 교체된다(병합·append 아님).
+featureFlags:
+  - alpha
+  - beta
+
+# global — 부모와 모든 subchart가 공유한다.
+global:
+  environment: dev
+  domain: example.local
