@@ -1,0 +1,6 @@
+apiVersion: v2
+name: my-service
+description: values.schema.json으로 입력을 검증하는 chart
+type: application
+version: 0.3.0
+appVersion: "1.27"

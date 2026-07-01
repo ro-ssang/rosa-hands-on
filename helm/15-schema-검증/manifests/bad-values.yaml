@@ -1,0 +1,4 @@
+replicaCount: 0          # minimum 1 위반
+logLevel: trace          # enum(debug/info/warn/error) 위반
+service:
+  port: "eighty"         # integer 아님
