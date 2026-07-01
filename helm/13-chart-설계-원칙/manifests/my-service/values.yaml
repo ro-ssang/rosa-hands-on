@@ -1,0 +1,33 @@
+# 이름 재정의 — 비워두면 chart 이름에서 유도한다.
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "1.27"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+config:
+  LOG_LEVEL: info
+  GREETING: "hello"
+
+ingress:
+  enabled: false
+  className: ""
+  hosts:
+    - host: my-service.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+# 아래 넷은 열어두되 비워둔다 — 채우지 않으면 매니페스트에 나타나지 않는다.
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

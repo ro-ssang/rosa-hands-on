@@ -1,0 +1,6 @@
+apiVersion: v2
+name: my-service
+description: 설계 원칙(노출/숨김·이름 관례·스케줄링 훅)을 적용한 chart
+type: application
+version: 0.2.0
+appVersion: "1.27"
