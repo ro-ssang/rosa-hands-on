@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hardened
+  labels:
+    app: hardened
+spec:
+  securityContext:
+    runAsNonRoot: true          # root면 아예 시작 거부
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault      # 위험한 syscall 차단
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sleep", "infinity"]
+      securityContext:
+        allowPrivilegeEscalation: false   # setuid로 권한 상승 금지
+        readOnlyRootFilesystem: true      # 루트 파일시스템 읽기전용
+        capabilities:
+          drop: ["ALL"]                   # 모든 리눅스 capability 제거

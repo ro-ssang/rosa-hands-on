@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root
+  labels:
+    app: root
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["sleep", "infinity"]
+      # securityContext 없음 — 기본값으로 root(uid 0)로 돈다

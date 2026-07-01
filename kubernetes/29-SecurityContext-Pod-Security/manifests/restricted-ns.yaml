@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: secure
+  labels:
+    # 이 namespace에 오는 Pod은 restricted 표준을 만족해야 생성됨
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    # 만족 못 하면 경고만 내는 모드(도구 단계에서 보임)
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
