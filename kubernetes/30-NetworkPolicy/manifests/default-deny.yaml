@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-default-deny
+  namespace: rosa-lab
+spec:
+  podSelector:
+    matchLabels:
+      app: web          # 이 정책은 app=web Pod에만 적용
+  policyTypes:
+    - Ingress
+  # ingress 규칙이 하나도 없음 → web으로 들어오는 트래픽은 전부 거부

@@ -1,0 +1,5 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  disableDefaultCNI: true         # 기본 kindnet 끄기(NetworkPolicy 강제 안 함)
+  podSubnet: "192.168.0.0/16"     # Calico 기본 대역
