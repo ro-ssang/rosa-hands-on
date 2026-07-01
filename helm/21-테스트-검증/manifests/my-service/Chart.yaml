@@ -1,0 +1,6 @@
+apiVersion: v2
+name: my-service
+description: 테스트 피라미드(lint·template·unittest·helm test)를 갖춘 chart
+type: application
+version: 0.5.0
+appVersion: "1.27"

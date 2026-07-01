@@ -1,0 +1,31 @@
+suite: deployment 렌더 검증
+templates:
+  - deployment.yaml
+tests:
+  - it: replicaCount 값이 spec.replicas로 들어간다
+    set:
+      replicaCount: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: image는 repository:tag로 조합된다
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: nginx:1.27
+
+  - it: 객체 이름은 release 이름을 접두사로 쓴다
+    release:
+      name: web
+    asserts:
+      - equal:
+          path: metadata.name
+          value: web-my-service
+
+  - it: 컨테이너 포트는 80이다
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
