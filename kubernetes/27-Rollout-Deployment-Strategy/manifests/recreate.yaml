@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recreate
+  namespace: rosa-lab
+  labels:
+    app: recreate
+spec:
+  replicas: 4
+  strategy:
+    type: Recreate        # 옛 Pod을 전부 종료한 뒤 새 Pod을 만든다
+  selector:
+    matchLabels:
+      app: recreate
+  template:
+    metadata:
+      labels:
+        app: recreate
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25-alpine
+          ports:
+            - containerPort: 80
