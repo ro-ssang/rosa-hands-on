@@ -1,0 +1,6 @@
+replicaCount: 1
+image:
+  repository: nginx
+  version: "1.28"
+service:
+  port: 80

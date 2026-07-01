@@ -1,0 +1,26 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+apiVersion: v2
+appVersion: "1.28"
+description: 출처·서명(provenance·sign·verify)을 붙일 chart
+name: my-service
+type: application
+version: 1.2.0
+
+...
+files:
+  my-service-1.2.0.tgz: sha256:722b053d3d105bfca0ea848625e7fc0d539954453a26c50214842a957d0ee66f
+-----BEGIN PGP SIGNATURE-----
+
+wsDcBAEBCgAQBQJqRK5/CRBj/j6ovqm4rQAAZQMMAI/mq79oNBZcnuai1Ihph/4e
+uIgYKd7PoVOiqChxNuQ21nJGQtvk2QYn2EnRGq3TxNNe0l7pCDOUtqn62d+LrKIu
+51Moi95YXN8T3Uifbmj7/7z3o/OSPkAZrQUbYAgiA79JMHO22/sWql2RS+Mh5TYu
+ZX70mgvlmfw/oNzI/RdpNNX4CQ7k3hhi/RQONLscDULht5lPfGcJAlEvhOBH7fYp
+WY5ZvljPQlpW/P2iFo6qc6Nr7gNdcB3I7U6LwnQQ1VmOKOZBAsxFGUAlT0L1rKON
+Z2VGzg1rgGnc7HO1l0UwTYWfoHrda4/Xb5QDZA4QKVD7ktm4Fe5xmwZiMHhFeHyq
+HM+lV+LGVjw29l9ZcuMFuIOb3MIxVFe+LPWEqy3KtGvBzZ7k1pk+KUKK+V94uo8d
+JduO0kUcADuMRpE34/cSa+UPVafVtxwXA8OKabmS3hFKrlKNcfspdvJRnP1mhC7E
+coq8AlgSIQT2rwSGjhDMp+iLEYMd+Di49sKXj2Adhg==
+=ON/E
+-----END PGP SIGNATURE-----

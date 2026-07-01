@@ -1,0 +1,4 @@
+# 개인키(secret keyring)와 age/gpg 개인키 파일은 절대 커밋하지 않는다.
+secring.gpg
+*.secring
+key.txt
