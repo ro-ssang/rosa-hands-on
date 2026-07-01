@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: startup
+  namespace: rosa-lab
+  labels:
+    app: startup
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      # 시작에 15초가 걸리는 앱 — 그 뒤 /tmp/started 생성
+      args:
+        - /bin/sh
+        - -c
+        - sleep 15; touch /tmp/started; sleep 600
+      # 부팅 동안(최대 3s×10=30s) liveness를 억제
+      startupProbe:
+        exec:
+          command: ["cat", "/tmp/started"]
+        periodSeconds: 3
+        failureThreshold: 10
+      # 시작을 넘기면 이 엄격한 liveness가 켜진다 (startup 없으면 부팅 중 죽였을 설정)
+      livenessProbe:
+        exec:
+          command: ["cat", "/tmp/started"]
+        periodSeconds: 3
+        failureThreshold: 1

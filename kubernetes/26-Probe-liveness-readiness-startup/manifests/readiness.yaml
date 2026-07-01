@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: readiness
+  namespace: rosa-lab
+  labels:
+    app: readiness
+spec:
+  containers:
+    - name: app
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        exec:
+          command: ["cat", "/tmp/ready"]   # /tmp/ready가 있어야 준비 완료
+        periodSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: readiness
+  namespace: rosa-lab
+spec:
+  selector:
+    app: readiness
+  ports:
+    - port: 80
+      targetPort: 80
