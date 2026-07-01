@@ -1,0 +1,24 @@
+# Argo CD Application — "무엇을, 어디에, 어떻게" 배포할지를 선언한다.
+# 명령(helm install)이 아니라 이 선언을 Git/클러스터에 두면, Argo CD가 맞춰 reconcile한다.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: podinfo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://stefanprodan.github.io/podinfo   # Helm chart repo
+    chart: podinfo
+    targetRevision: 6.14.0                            # chart version
+    helm:
+      parameters:
+        - name: replicaCount
+          value: "2"                                  # values를 여기서 선언
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: rosa-lab
+  syncPolicy:
+    automated: {}                                     # Git=진실, 자동 동기화
+    syncOptions:
+      - CreateNamespace=true
