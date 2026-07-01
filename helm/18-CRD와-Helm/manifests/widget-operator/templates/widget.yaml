@@ -1,0 +1,6 @@
+apiVersion: rosa.dev/v1
+kind: Widget
+metadata:
+  name: {{ .Release.Name }}-sample
+spec:
+  size: small

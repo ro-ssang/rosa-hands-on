@@ -1,0 +1,6 @@
+apiVersion: v2
+name: widget-operator
+description: crds/에 CRD(API)를, templates/에 그 CR과 operator를 둔 chart
+type: application
+version: 0.1.0
+appVersion: "1.0"
