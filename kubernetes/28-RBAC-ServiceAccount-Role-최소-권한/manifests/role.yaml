@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: rosa-lab
+rules:
+  - apiGroups: [""]          # 코어 그룹(pods 등)
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]   # 읽기만 — create/delete 없음
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: reader-can-read-pods
+  namespace: rosa-lab
+subjects:
+  - kind: ServiceAccount
+    name: reader
+    namespace: rosa-lab
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
