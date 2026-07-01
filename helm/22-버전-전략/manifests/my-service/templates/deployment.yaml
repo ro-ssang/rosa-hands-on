@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-my-service
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-my-service
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-my-service
+    spec:
+      containers:
+        - name: my-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.version }}"
+          ports:
+            - containerPort: 80
+          resources: {{- toYaml .Values.resources | nindent 12 }}

@@ -1,0 +1,6 @@
+# 1.0.0 이전(0.x) 인터페이스로 값을 넘기는 파일.
+# image.tag 는 1.0.0에서 image.version 으로 바뀌었다.
+# 이 파일로 렌더하면 image.tag(1.25)는 조용히 무시되고, chart 기본값 image.version(1.28)이 그대로 나온다.
+image:
+  repository: nginx
+  tag: "1.25"

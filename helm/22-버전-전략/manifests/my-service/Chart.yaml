@@ -1,0 +1,12 @@
+apiVersion: v2
+name: my-service
+description: 버전 전략(SemVer·version/appVersion·breaking change 알림)을 적용한 chart
+type: application
+version: 1.0.0
+appVersion: "1.28"
+annotations:
+  artifacthub.io/changes: |
+    - kind: changed
+      description: "values 키를 image.tag → image.version 으로 변경 (breaking)"
+    - kind: added
+      description: "resources 값 추가 (선택, 하위호환)"
