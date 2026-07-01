@@ -6,13 +6,13 @@
 
 ```mermaid
 flowchart TB
-    subgraph S["서명 (배포자)"]
-        C["chart .tgz"] -->|helm package --sign\n(개인키)| P[".prov\nChart.yaml + tgz SHA-256\n+ GPG 서명"]
+    subgraph S["서명 — 배포자, 개인키"]
+        C["chart .tgz"] -->|helm package --sign| P[".prov\nChart.yaml + tgz SHA-256 + GPG 서명"]
     end
-    subgraph V["검증 (소비자)"]
-        P2[".prov"] -->|helm verify\n(공개키)| R{"둘 다 맞나?"}
-        R -->|서명=공개키 & 해시 일치| OK["통과"]
-        R -->|서명 불명 or 해시 불일치| NG["실패"]
+    subgraph V["검증 — 소비자, 공개키"]
+        P2[".prov"] -->|helm verify| R{"서명·해시\n둘 다 맞나?"}
+        R -->|일치| OK["통과"]
+        R -->|서명 불명·해시 불일치| NG["실패"]
     end
 ```
 
