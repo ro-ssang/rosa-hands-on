@@ -13,6 +13,7 @@ Terraform(인프라)과 Kubernetes(워크로드) 사이의 이음매 — AWS 관
 | 5 | [node group](./5-node-group) | 노드를 어떻게 띄우는가? (managed node group vs self-managed vs Fargate) |
 | 6 | [Karpenter](./6-Karpenter) | 노드를 누가 자동으로 늘리는가? (Karpenter vs Cluster Autoscaler·consolidation) |
 | 7 | [인스턴스 전략](./7-인스턴스-전략) | 비용을 어떻게 줄이는가? (spot·타입 다양화·right-sizing·interruption 처리) |
+| 8 | [IAM ↔ Kubernetes 연결](./8-IAM-Kubernetes-연결) | AWS 권한이 어떻게 k8s까지 들어오는가? (IAM·STS·OIDC·ServiceAccount) |
 
 ## 고정값
 
