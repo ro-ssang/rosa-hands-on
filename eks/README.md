@@ -1,0 +1,23 @@
+# EKS
+
+Terraform(인프라)과 Kubernetes(워크로드) 사이의 이음매 — AWS 관리형 Kubernetes만의 고유 지점(책임 분담 · Access Entry · IRSA · VPC CNI · 노드 전략 · 애드온 · 업그레이드 · 비용)을 다룹니다.
+
+## 시리즈
+
+| # | 주제 | 질문 |
+|---|---|---|
+| 1 | [왜 EKS인가](./1-왜-EKS인가) | self-managed k8s 대비 AWS는 무엇을 대신 맡는가? (관리형 control plane, eksctl vs Terraform) |
+
+## 고정값
+
+| 항목 | 값 |
+|---|---|
+| AWS 프로필 | `rosa-lab` |
+| 리전 | `ap-northeast-2` (서울) |
+| 클러스터 이름 | `rosa-lab` |
+| IaC | Terraform (`terraform-aws-eks` 모듈 중심) |
+
+## 전제
+
+- terraform 시리즈 — VPC · IAM · 모듈 · remote state
+- kubernetes 시리즈 — 워크로드 전반(Deployment · Service · PV/PVC · HPA · 스케줄링 · NetworkPolicy)
