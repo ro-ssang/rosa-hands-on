@@ -11,6 +11,7 @@ Terraform(인프라)과 Kubernetes(워크로드) 사이의 이음매 — AWS 관
 | 3 | [클러스터 생성 — Terraform](./3-클러스터-생성-Terraform) | EKS 하나를 띄우면 실제로 무엇이 만들어지는가? (cluster·IAM role·SG·OIDC·node group) |
 | 4 | [클러스터 접근 제어](./4-클러스터-접근-제어) | 누가 클러스터에 들어올 수 있는가? (kubeconfig·IAM→Access Entry→RBAC·break-glass) |
 | 5 | [node group](./5-node-group) | 노드를 어떻게 띄우는가? (managed node group vs self-managed vs Fargate) |
+| 6 | [Karpenter](./6-Karpenter) | 노드를 누가 자동으로 늘리는가? (Karpenter vs Cluster Autoscaler·consolidation) |
 
 ## 고정값
 
